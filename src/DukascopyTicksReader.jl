@@ -87,6 +87,7 @@ module DukascopyTicksReader
     end
 
     function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+        cache = dr.cache
         download(dr, ticker, dt)
         filename = get_cache_file(dr, cache, ticker, dt)
         reader = TickReader(dt::DateTime, ticker, filename)

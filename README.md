@@ -17,8 +17,8 @@ julia> source = DukascopyTicks()
 DukascopyTicksReader.DukascopyTicks(DukascopyTicksReader.CacheDirectory(""))
 
 julia> reader = get(DukascopyTicks(), "EURUSD", DateTime(2016, 3, 28, 0, 40))
-get EURUSD for 2016-03-28T00:40:00 from fname=~/data/dukascopy/ticks/2016/2016-03/2016-03-28/EURUSD/00h_ticks.bi5
-DukascopyTicksReader.TickReader("~/data/dukascopy/ticks/2016/2016-03/2016-03-28/EURUSD/00h_ticks.bi5",LibArchive.Reader{LibArchive.ReadFileName{UTF8String}}(LibArchive.ReadFileName{UTF8String}("~/data/dukascopy/ticks/2016/2016-03/2016-03-28/EURUSD/00h_ticks.bi5",10240),Ptr{Void} @0x00007fbcfbcf7800,true),DukascopyTicksReader.TickIter{Base.AbstractIOBuffer{Array{UInt8,1}}}(IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=53000, maxsize=Inf, ptr=1, mark=-1),(anonymous function),2016-03-28T00:00:00,0x0000000000000005))
+get EURUSD for 2016-03-28T00:40:00 from fname=~/data/dukascopy/ticks/2016/2016-03/2016-03-28/2016-03-28_000000/EURUSD.bi5
+DukascopyTicksReader.TickReader("~/data/dukascopy/ticks/2016/2016-03/2016-03-28/2016-03-28_000000/EURUSD.bi5",LibArchive.Reader{LibArchive.ReadFileName{UTF8String}}(LibArchive.ReadFileName{UTF8String}("~/data/dukascopy/ticks/2016/2016-03/2016-03-28/2016-03-28_000000/EURUSD.bi5",10240),Ptr{Void} @0x00007fbcfbcf7800,true),DukascopyTicksReader.TickIter{Base.AbstractIOBuffer{Array{UInt8,1}}}(IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=53000, maxsize=Inf, ptr=1, mark=-1),(anonymous function),2016-03-28T00:00:00,0x0000000000000005))
 
 julia> to_dataframe(reader)
 2650×5 DataFrames.DataFrame

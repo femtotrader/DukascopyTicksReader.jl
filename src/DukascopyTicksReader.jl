@@ -32,8 +32,11 @@ module DukascopyTicksReader
     function get_cache_dir(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
         if cache.dir == ""
             d = Date(dt)
+            #dt_round = DateTime(Dates.year(dt), Dates.month(dt), Dates.day(dt), Dates.hour(dt))
+            #joinpath(homedir(), "data", "dukascopy", "ticks",
+            #               string(Dates.year(d)), string(d)[1:end-3], string(d), ticker)
             joinpath(homedir(), "data", "dukascopy", "ticks",
-                           string(Dates.year(d)), string(d)[1:end-3], string(d), ticker)
+                       string(Dates.year(d)), string(d)[1:end-3], string(d), Dates.format(dt, "yyyy-mm-dd_HH0000"))
         else
             cache.dir
         end
@@ -47,13 +50,14 @@ module DukascopyTicksReader
         format("http://www.dukascopy.com/datafeed/{1}/{2:04d}/{3:02d}/{4:02d}/{5:02d}h_ticks.bi5", "EURUSD", yy, mm, dd, hh)
     end
     
-    function get_filename(dr::DukascopyTicks, dt::DateTime)
-        hh = Dates.hour(dt)
-        format("{1:02d}h_ticks.bi5", hh)
+    function get_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+        #hh = Dates.hour(dt)
+        #format("{1:02d}h_ticks.bi5", hh)
+        ticker * ".bi5"
     end
 
     function get_cache_file(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
-        joinpath(get_cache_dir(dr, cache, ticker, dt), get_filename(dr, dt))
+        joinpath(get_cache_dir(dr, cache, ticker, dt), get_filename(dr, ticker, dt))
     end
     
     function get_from_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
@@ -73,7 +77,7 @@ module DukascopyTicksReader
     end
     
     function is_in_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
-        filename = joinpath(get_cache_dir(dr, cache, ticker, dt), get_filename(dr, dt))
+        filename = joinpath(get_cache_dir(dr, cache, ticker, dt), get_filename(dr, ticker, dt))
         isfile(filename)
     end
         

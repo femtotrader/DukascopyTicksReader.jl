@@ -59,7 +59,7 @@ module DukascopyTicksReader
         mm = Dates.month(dt)
         dd = Dates.day(dt)
         hh = Dates.hour(dt)
-        format("http://www.dukascopy.com/datafeed/{1}/{2:04d}/{3:02d}/{4:02d}/{5:02d}h_ticks.bi5", "EURUSD", yy, mm, dd, hh)
+        format("http://www.dukascopy.com/datafeed/{1}/{2:04d}/{3:02d}/{4:02d}/{5:02d}h_ticks.bi5", ticker, yy, mm, dd, hh)
     end
     
     function _data_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)

@@ -13,7 +13,7 @@ module DukascopyTicksReader
     struct NoCache <: AbstractCache
     end
     
-    type CacheDirectory <: AbstractCache
+    struct CacheDirectory <: AbstractCache
         dir::AbstractString
         
         CacheDirectory() = new("")

@@ -6,7 +6,7 @@
 ## Installation
 
 ```julia
-julia> Pkg.clone("https://github.com/femtotrader/DukascopyTicksReader.jl.git")
+julia> Pkg.clone("https://github.com/femtotrader/DukascopyTicksReader.jl")
 ```
 
 ## Usage

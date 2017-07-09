@@ -8,9 +8,9 @@ module DukascopyTicksReader
     
     using Formatting
     
-    abstract AbstractCache
+    abstract type AbstractCache end
     
-    type NoCache <: AbstractCache
+    struct NoCache <: AbstractCache
     end
     
     type CacheDirectory <: AbstractCache
@@ -20,8 +20,9 @@ module DukascopyTicksReader
         CacheDirectory(dir) = new(dir)
     end
 
-    abstract AbstractDataReader
-    type DukascopyTicks <: AbstractDataReader
+    abstract type AbstractDataReader end
+    
+    struct DukascopyTicks <: AbstractDataReader
         cache::AbstractCache
 
         function DukascopyTicks()

@@ -1,7 +1,7 @@
 import Base: start, done, next
 using LibArchive
 
-immutable TickRawRecordType
+struct TickRawRecordType
   Date::UInt32
   Ask::UInt32
   Bid::UInt32
@@ -9,7 +9,7 @@ immutable TickRawRecordType
   BidVolume::Float32
 end
 
-immutable TickRecordType
+struct TickRecordType
   Date::DateTime
   Ask::AbstractFloat
   Bid::AbstractFloat
@@ -83,15 +83,31 @@ type TickReader
     end
 end
 
+
+
 function to_arrays(reader::TickReader)
     itr = reader.itr
     seek(itr.stream, 0)
-    arr = collect(itr)
-    a_date = Array{DateTime}(map(rec->rec.Date, arr))
-    a_ask = Array{Float64}(map(rec->rec.Ask, arr))
-    a_bid = Array{Float64}(map(rec->rec.Bid, arr))
-    a_ask_vol = Array{Float64}(map(rec->rec.AskVolume, arr))
-    a_bid_vol = Array{Float64}(map(rec->rec.BidVolume, arr))
+    #arr = collect(itr)  # MethodError: no method matching length(...) with Julia 0.6 (and probably 0.5)
+    #a_date = Array{DateTime}(map(rec->rec.Date, arr))
+    #a_ask = Array{Float64}(map(rec->rec.Ask, arr))
+    #a_bid = Array{Float64}(map(rec->rec.Bid, arr))
+    #a_ask_vol = Array{Float64}(map(rec->rec.AskVolume, arr))
+    #a_bid_vol = Array{Float64}(map(rec->rec.BidVolume, arr))
+    a_date = Vector{DateTime}()
+    a_ask = Vector{Float64}()
+    a_bid = Vector{Float64}()
+    a_ask_vol = Vector{Float64}()
+    a_bid_vol = Vector{Float64}()
+    state = start(itr);
+    while !done(itr, state)
+        rec, state = next(itr, state)
+        push!(a_date, rec.Date)
+        push!(a_ask, rec.Ask)
+        push!(a_bid, rec.Bid)
+        push!(a_ask_vol, rec.AskVolume)
+        push!(a_bid_vol, rec.BidVolume)
+    end
     a_date, a_ask, a_bid, a_ask_vol, a_bid_vol
 end
 

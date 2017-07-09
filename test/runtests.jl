@@ -26,11 +26,10 @@ ticker = "USDCHF"
 data = get(source, ticker, dt)
 #println(data)
 
-#println(to_arrays(data))
+#a = to_arrays(data)
 
 df = to_dataframe(data)
 println(df)
-
 
 ta = to_timearray(data)
 println(ta)

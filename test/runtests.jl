@@ -1,6 +1,6 @@
 using DukascopyTicksReader
 using DukascopyTicksReader: get, to_arrays, to_dataframe, to_timearray
-using DukascopyTicksReader: _get_cache_dir, _get_filename, _get_url
+using DukascopyTicksReader: _cache_dir, _data_filename, _url
 
 
 using Base.Test
@@ -15,13 +15,13 @@ source = DukascopyTicks()
 #@test get_cache_dir(source, cache, ticker, dt) == joinpath(homedir(), "data", "dukascopy", "ticks",
 #                       "2016", "2016-03", "2016-03-28", "EURUSD")
 
-@test _get_cache_dir(source, cache, ticker, dt) == joinpath(homedir(), "data", "dukascopy", "ticks",
+@test _cache_dir(source, cache, ticker, dt) == joinpath(homedir(), "data", "dukascopy", "ticks",
                        "2016", "2016-03", "2016-03-28", "2016-03-28_000000")
 
 #@test get_filename(source, dt) == "00h_ticks.bi5"
-@test _get_filename(source, ticker, dt) == "EURUSD.bi5"
+@test _data_filename(source, ticker, dt) == "EURUSD.bi5"
 
-@test _get_url(source, ticker, dt) == "http://www.dukascopy.com/datafeed/EURUSD/2016/03/28/00h_ticks.bi5"
+@test _url(source, ticker, dt) == "http://www.dukascopy.com/datafeed/EURUSD/2016/03/28/00h_ticks.bi5"
 
 ticker = "USDCHF"
 data = get(source, ticker, dt)

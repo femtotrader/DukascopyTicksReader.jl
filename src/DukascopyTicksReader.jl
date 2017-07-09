@@ -20,6 +20,16 @@ module DukascopyTicksReader
         CacheDirectory(dir) = new(dir)
     end
 
+
+    abstract type AbstractDataCacheSource end
+
+    struct DataFromNetwork <: AbstractDataCacheSource
+    end
+
+    struct DataFromCache <: AbstractDataCacheSource
+    end
+    
+
     abstract type AbstractDataReader end
     
     struct DukascopyTicks <: AbstractDataReader
@@ -30,7 +40,8 @@ module DukascopyTicksReader
         end        
     end
 
-    function _get_cache_dir(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
+
+    function _cache_dir(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
         if cache.dir == ""
             d = Date(dt)
             #dt_round = DateTime(Dates.year(dt), Dates.month(dt), Dates.day(dt), Dates.hour(dt))
@@ -43,7 +54,7 @@ module DukascopyTicksReader
         end
     end
         
-    function _get_url(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+    function _url(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
         yy = Dates.year(dt)
         mm = Dates.month(dt)
         dd = Dates.day(dt)
@@ -51,26 +62,26 @@ module DukascopyTicksReader
         format("http://www.dukascopy.com/datafeed/{1}/{2:04d}/{3:02d}/{4:02d}/{5:02d}h_ticks.bi5", "EURUSD", yy, mm, dd, hh)
     end
     
-    function _get_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+    function _data_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
         #hh = Dates.hour(dt)
         #format("{1:02d}h_ticks.bi5", hh)
         ticker * ".bi5"
     end
 
-    function _get_cache_file(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
-        joinpath(_get_cache_dir(dr, cache, ticker, dt), _get_filename(dr, ticker, dt))
+    function _cache_filename(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
+        joinpath(_cache_dir(dr, cache, ticker, dt), _data_filename(dr, ticker, dt))
     end
     
-    function _get_from_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
-        filename = _get_cache_file(dr, cache, ticker, dt)
+    function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, ::DataFromCache, cache::CacheDirectory)
+        filename = _cache_filename(dr, cache, ticker, dt)
         println("get $ticker for $dt from fname=$filename")
     end
         
-    function _get_from_network(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
-        url = _get_url(dr, ticker, dt)
-        filename = _get_cache_file(dr, cache, ticker, dt)
+    function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, ::DataFromNetwork, cache::CacheDirectory)
+        url = _url(dr, ticker, dt)
+        filename = _cache_filename(dr, cache, ticker, dt)
         if !ispath(filename)
-            mkpath(_get_cache_dir(dr, cache, ticker, dt))
+            mkpath(_cache_dir(dr, cache, ticker, dt))
         end
         println("download $url")
         download(url, filename)
@@ -78,23 +89,23 @@ module DukascopyTicksReader
     end
     
     function _is_in_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
-        filename = joinpath(_get_cache_dir(dr, cache, ticker, dt), _get_filename(dr, ticker, dt))
+        filename = joinpath(_cache_dir(dr, cache, ticker, dt), _data_filename(dr, ticker, dt))
         isfile(filename)
     end
         
     function download(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
         cache = dr.cache
         if _is_in_cache(dr, ticker, dt, cache)
-            _get_from_cache(dr, ticker, dt, cache)
+            get(dr, ticker, dt, DataFromCache(), cache)
         else
-            _get_from_network(dr, ticker, dt, cache)
+            get(dr, ticker, dt, DataFromNetwork(), cache)
         end
     end
 
     function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
         cache = dr.cache
         download(dr, ticker, dt)
-        filename = _get_cache_file(dr, cache, ticker, dt)
+        filename = _cache_filename(dr, cache, ticker, dt)
         reader = TickReader(dt::DateTime, ticker, filename)
         reader
     end

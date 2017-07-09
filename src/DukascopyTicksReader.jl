@@ -61,12 +61,12 @@ module DukascopyTicksReader
         joinpath(_get_cache_dir(dr, cache, ticker, dt), _get_filename(dr, ticker, dt))
     end
     
-    function get_from_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
+    function _get_from_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
         filename = _get_cache_file(dr, cache, ticker, dt)
         println("get $ticker for $dt from fname=$filename")
     end
         
-    function get_from_network(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
+    function _get_from_network(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
         url = _get_url(dr, ticker, dt)
         filename = _get_cache_file(dr, cache, ticker, dt)
         if !ispath(filename)
@@ -85,9 +85,9 @@ module DukascopyTicksReader
     function download(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
         cache = dr.cache
         if _is_in_cache(dr, ticker, dt, cache)
-            get_from_cache(dr, ticker, dt, cache)
+            _get_from_cache(dr, ticker, dt, cache)
         else
-            get_from_network(dr, ticker, dt, cache)
+            _get_from_network(dr, ticker, dt, cache)
         end
     end
 

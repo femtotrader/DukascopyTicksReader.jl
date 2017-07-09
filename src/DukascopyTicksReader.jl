@@ -62,14 +62,14 @@ module DukascopyTicksReader
         format("http://www.dukascopy.com/datafeed/{1}/{2:04d}/{3:02d}/{4:02d}/{5:02d}h_ticks.bi5", ticker, yy, mm, dd, hh)
     end
     
-    function _data_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+    function _destination_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
         #hh = Dates.hour(dt)
         #format("{1:02d}h_ticks.bi5", hh)
         ticker * ".bi5"
     end
 
     function _cache_filename(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
-        joinpath(_cache_dir(dr, cache, ticker, dt), _data_filename(dr, ticker, dt))
+        joinpath(_cache_dir(dr, cache, ticker, dt), _destination_filename(dr, ticker, dt))
     end
     
     function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, ::DataFromCache, cache::CacheDirectory)
@@ -89,7 +89,7 @@ module DukascopyTicksReader
     end
     
     function _is_in_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
-        filename = joinpath(_cache_dir(dr, cache, ticker, dt), _data_filename(dr, ticker, dt))
+        filename = joinpath(_cache_dir(dr, cache, ticker, dt), _destination_filename(dr, ticker, dt))
         isfile(filename)
     end
         

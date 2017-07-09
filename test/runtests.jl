@@ -1,45 +1,59 @@
 using DukascopyTicksReader
 using DukascopyTicksReader: get, to_arrays, to_dataframe, to_timearray
-using DukascopyTicksReader: _cache_dir, _data_filename, _url
+using DukascopyTicksReader: _cache_dir, _destination_filename, _url
 
 
 using Base.Test
 
-ticker = "EURUSD"
-dt = DateTime(2016, 3, 28, 0, 40)
-dt2 = DateTime(2016, 4, 8, 0, 40)
+@testset "DukascopyTicksReader" begin
 
-cache = CacheDirectory()
-source = DukascopyTicks()
 
-#@test get_cache_dir(source, cache, ticker, dt) == joinpath(homedir(), "data", "dukascopy", "ticks",
-#                       "2016", "2016-03", "2016-03-28", "EURUSD")
+    @testset "utils" begin
+        source = DukascopyTicks()
+        cache = CacheDirectory()
+        ticker = "EURUSD"
 
-@test _cache_dir(source, cache, ticker, dt) == joinpath(homedir(), "data", "dukascopy", "ticks",
-                       "2016", "2016-03", "2016-03-28", "2016-03-28_000000")
+        dt = DateTime(2016, 3, 28, 0, 40)
+        
+        @test _cache_dir(source, cache, ticker, dt) == joinpath(homedir(), "data", "dukascopy", "ticks",
+                               "2016", "2016-03", "2016-03-28", "2016-03-28_000000")
 
-#@test get_filename(source, dt) == "00h_ticks.bi5"
-@test _data_filename(source, ticker, dt) == "EURUSD.bi5"
+        @test _url(source, ticker, dt) == "http://www.dukascopy.com/datafeed/EURUSD/2016/03/28/00h_ticks.bi5"
+        
+        @test _destination_filename(source, ticker, dt) == "EURUSD.bi5"
+    end
 
-@test _url(source, ticker, dt) == "http://www.dukascopy.com/datafeed/EURUSD/2016/03/28/00h_ticks.bi5"
+    @testset "usage" begin
+        source = DukascopyTicks()
+        cache = CacheDirectory()
+        ticker = "USDCHF"
 
-ticker = "USDCHF"
-data = get(source, ticker, dt)
-#println(data)
+        dt = DateTime(2016, 3, 28, 0, 40)
+        dt2 = DateTime(2016, 4, 8, 0, 40)
 
-#a = to_arrays(data)
+        data = get(source, ticker, dt)
+        #println(data)
 
-df = to_dataframe(data)
-println(df)
+        #a = to_arrays(data)
 
-ta = to_timearray(data)
-println(ta)
+        @testset "DataFrame" begin
+            df = to_dataframe(data)
+            # println(df)
+        end
 
-#data = get(source, ticker, dt, dt2)
-#println(data)
+        @testset "TimeArray" begin
+            ta = to_timearray(data)
+            # println(ta)
+        end
 
-#=
-tickers = ["EURUSD", "USDJPY"]
-data = get(source, tickers, dt, dt2)
-println(data)
-=#
+        #data = get(source, ticker, dt, dt2)
+        #println(data)
+
+        #=
+        tickers = ["EURUSD", "USDJPY"]
+        data = get(source, tickers, dt, dt2)
+        println(data)
+        =#
+    end
+
+end

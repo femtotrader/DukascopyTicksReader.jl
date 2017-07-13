@@ -8,7 +8,7 @@ module DukascopyTicksReader
 
     using Formatting
 
-    SKIP_ERROR_DEFAULT = false
+    SKIP_ERROR_DEFAULT = true
     
     abstract type AbstractCache end
 

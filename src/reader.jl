@@ -27,13 +27,13 @@ function convert(raw_rec::TickRawRecordType, dt_chunk, p_digits)
     )
 end
 
-type TickIter{S<:IO}
+mutable struct TickIter{S<:IO}
     stream::S
     ondone::Function
     dt_chunk::DateTime
     p_digits::UInt    
 end
-function TickIter{S<:IO}(stream::S, year, month, day, hour, symb; ondone=()->nothing)
+function TickIter(stream::S, year, month, day, hour, symb; ondone=()->nothing) where S<:IO
     TickIter{S}(stream, ondone, DateTime(year, month, day, hour), price_digits(symb))
 end
 
@@ -64,7 +64,7 @@ function done(itr::TickIter, nada)
     true
 end
 
-type TickReader
+mutable struct TickReader
     filename::AbstractString
     reader::LibArchive.Reader
     itr::TickIter

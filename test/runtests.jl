@@ -23,7 +23,7 @@ using Base.Test
         @test _destination_filename(source, ticker, dt) == "EURUSD.bi5"
     end
 
-    @testset "usage" begin
+    @testset "usage: get" begin
         source = DukascopyTicks()
         cache = CacheDirectory()
         ticker = "USDCHF"
@@ -54,6 +54,16 @@ using Base.Test
         data = get(source, tickers, dt, dt2)
         println(data)
         =#
+    end
+
+    @testset "usage: bulk download" begin
+        skip_error = true
+        tickers = ["AUDUSD", "USDCAD"]
+        # tickers = ["AUDUSD", "USDCAD", "USDCHF", "EURUSD", "GBPUSD", "NZDUSD"]
+        source = DukascopyTicks()
+        download(source, tickers, DateTime(2016, 1, 5), DateTime(2016, 1, 8), skip_error=skip_error)
+        # download(source, tickers, DateTime(2016, 1, 1), DateTime(Dates.today()), skip_error=skip_error)
+        # download(source, tickers, DateTime(2014, 1, 1), DateTime(Dates.today()), skip_error=skip_error)
     end
 
 end

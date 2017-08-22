@@ -9,6 +9,9 @@ module DukascopyTicksReader
     using Formatting
 
     SKIP_ERROR_DEFAULT = false
+
+    const Ticker = AbstractString
+    const Tickers = Vector{String}
     
     abstract type AbstractCache end
 
@@ -43,7 +46,7 @@ module DukascopyTicksReader
     end
 
 
-    function _cache_dir(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
+    function _cache_dir(dr::DukascopyTicks, cache::CacheDirectory, ticker::Ticker, dt::DateTime)
         if cache.dir == ""
             d = Date(dt)
             #dt_round = DateTime(Dates.year(dt), Dates.month(dt), Dates.day(dt), Dates.hour(dt))
@@ -56,7 +59,7 @@ module DukascopyTicksReader
         end
     end
 
-    function _url(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+    function _url(dr::DukascopyTicks, ticker::Ticker, dt::DateTime)
         yy = Dates.year(dt)
         mm = Dates.month(dt)
         dd = Dates.day(dt)
@@ -64,22 +67,22 @@ module DukascopyTicksReader
         format("http://www.dukascopy.com/datafeed/{1}/{2:04d}/{3:02d}/{4:02d}/{5:02d}h_ticks.bi5", ticker, yy, mm, dd, hh)
     end
 
-    function _destination_filename(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime)
+    function _destination_filename(dr::DukascopyTicks, ticker::Ticker, dt::DateTime)
         #hh = Dates.hour(dt)
         #format("{1:02d}h_ticks.bi5", hh)
         ticker * ".bi5"
     end
 
-    function _cache_filename(dr::DukascopyTicks, cache::CacheDirectory, ticker::AbstractString, dt::DateTime)
+    function _cache_filename(dr::DukascopyTicks, cache::CacheDirectory, ticker::Ticker, dt::DateTime)
         joinpath(_cache_dir(dr, cache, ticker, dt), _destination_filename(dr, ticker, dt))
     end
 
-    function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, ::DataFromCache, cache::CacheDirectory, skip_error::Bool)
+    function get(dr::DukascopyTicks, ticker::Ticker, dt::DateTime, ::DataFromCache, cache::CacheDirectory, skip_error::Bool)
         filename = _cache_filename(dr, cache, ticker, dt)
         println("get $ticker for $dt from fname=$filename")
     end
 
-    function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, ::DataFromNetwork, cache::CacheDirectory, skip_error::Bool)
+    function get(dr::DukascopyTicks, ticker::Ticker, dt::DateTime, ::DataFromNetwork, cache::CacheDirectory, skip_error::Bool)
         url = _url(dr, ticker, dt)
         filename = _cache_filename(dr, cache, ticker, dt)
         if !ispath(filename)
@@ -98,12 +101,12 @@ module DukascopyTicksReader
         println("save $ticker for $dt to cache $filename")
     end
 
-    function _is_in_cache(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime, cache::CacheDirectory)
+    function _is_in_cache(dr::DukascopyTicks, ticker::Ticker, dt::DateTime, cache::CacheDirectory)
         filename = joinpath(_cache_dir(dr, cache, ticker, dt), _destination_filename(dr, ticker, dt))
         isfile(filename)
     end
 
-    function download(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
+    function download(dr::DukascopyTicks, ticker::Ticker, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
         cache = dr.cache
         if _is_in_cache(dr, ticker, dt, cache)
             get(dr, ticker, dt, DataFromCache(), cache, skip_error)
@@ -112,7 +115,7 @@ module DukascopyTicksReader
         end
     end
 
-    function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
+    function get(dr::DukascopyTicks, ticker::Ticker, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
         cache = dr.cache
         download(dr, ticker, dt, skip_error=skip_error)
         filename = _cache_filename(dr, cache, ticker, dt)
@@ -120,18 +123,18 @@ module DukascopyTicksReader
         reader
     end
 
-    function download(dr::AbstractDataReader, ticker::AbstractString, dt_range::StepRange; skip_error=SKIP_ERROR_DEFAULT)
+    function download(dr::AbstractDataReader, ticker::Union{Ticker, Tickers}, dt_range::StepRange; skip_error=SKIP_ERROR_DEFAULT)
         for dt in dt_range
             download(dr, ticker, dt, skip_error=skip_error)
         end
     end
 
-    function download(dr::DukascopyTicks, ticker::AbstractString, start::DateTime, stop::DateTime; skip_error=SKIP_ERROR_DEFAULT)
+    function download(dr::DukascopyTicks, ticker::Union{Ticker, Tickers}, start::DateTime, stop::DateTime; skip_error=SKIP_ERROR_DEFAULT)
         step = Dates.Hour(1)
         download(dr, ticker, start:step:stop-step, skip_error=skip_error)
     end
 
-    function download(dr::AbstractDataReader, tickers, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
+    function download(dr::AbstractDataReader, tickers::Tickers, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
         for ticker in tickers
             download(dr, ticker, dt, skip_error=skip_error)
         end

@@ -114,19 +114,19 @@ module DukascopyTicksReader
 
     function get(dr::DukascopyTicks, ticker::AbstractString, dt::DateTime; skip_error=SKIP_ERROR_DEFAULT)
         cache = dr.cache
-        download(dr, ticker, dt, skip_error)
+        download(dr, ticker, dt, skip_error=skip_error)
         filename = _cache_filename(dr, cache, ticker, dt)
         reader = TickReader(dt::DateTime, ticker, filename)
         reader
     end
 
-    function download(dr::AbstractDataReader, ticker, dt_range::StepRange; skip_error=SKIP_ERROR_DEFAULT)
+    function download(dr::AbstractDataReader, ticker::AbstractString, dt_range::StepRange; skip_error=SKIP_ERROR_DEFAULT)
         for dt in dt_range
             download(dr, ticker, dt, skip_error=skip_error)
         end
     end
 
-    function download(dr::DukascopyTicks, ticker, start, stop; skip_error=SKIP_ERROR_DEFAULT)
+    function download(dr::DukascopyTicks, ticker::AbstractString, start::DateTime, stop::DateTime; skip_error=SKIP_ERROR_DEFAULT)
         step = Dates.Hour(1)
         download(dr, ticker, start:step:stop-step, skip_error=skip_error)
     end

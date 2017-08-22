@@ -27,7 +27,7 @@ function convert(raw_rec::TickRawRecordType, dt_chunk, p_digits)
     )
 end
 
-mutable struct TickIter{S<:IO}
+struct TickIter{S<:IO}
     stream::S
     ondone::Function
     dt_chunk::DateTime
@@ -64,7 +64,7 @@ function done(itr::TickIter, nada)
     true
 end
 
-mutable struct TickReader
+struct TickReader
     filename::AbstractString
     reader::LibArchive.Reader
     itr::TickIter
